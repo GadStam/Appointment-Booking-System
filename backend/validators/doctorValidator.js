@@ -63,4 +63,8 @@ function validateDoctor(object) {
   return doctorSchema.safeParse(object);
 }
 
-export { validateDoctor };
+function validatePartialDoctor(object) {
+  return doctorSchema.partial().safeParse(object); // partial: para que todas las propiedades definidas en él se vuelvan opcionales.
+}
+
+export { validateDoctor, validatePartialDoctor };
