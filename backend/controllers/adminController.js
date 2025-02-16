@@ -13,7 +13,7 @@ import { validateDoctor, validatePartialDoctor } from "../validators/doctorValid
 const addDoctor = async (req, res) => {
     try {
         const {name, email, password, image, speciality, degree, experience, about, fees, address} = req.body;
-        console.log("Request Body:", req.body);
+        
         const imageFile = req.file
         let parsedAddress = JSON.parse(address);
         const errors = validateDoctor({ ...req.body, address: parsedAddress });
@@ -43,11 +43,10 @@ const addDoctor = async (req, res) => {
 const loginAdmin = async (req, res) =>{
     try{
       const { email, password } = req.body;
-      console.log("Request Body:", req.body);
+      
 
       // Log environment variables for debugging
-      console.log("Admin Email from Env:", process.env.ADMIN_EMAIL);
-      console.log("Admin Password from Env:", process.env.ADMIN_PASSWORD);
+      
       const result = validatePartialDoctor({email, password});
         if(!result.success){
             return res.status(400).json(result)
