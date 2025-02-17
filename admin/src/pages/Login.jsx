@@ -1,51 +1,56 @@
-import React, { useContext, useState } from 'react'
-import {assets} from '../assets/assets'
-import { AdminContext } from '../context/AdminContext'
-import axios from 'axios'
-import Cookies from 'js-cookie'
-import { toast } from 'react-toastify'
+import React, { useContext, useState } from "react";
+import { assets } from "../assets/assets";
+import { AdminContext } from "../context/AdminContext";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { useSnackbar } from "notistack"; // Import useSnackbar from notistack
 
 const Login = () => {
-    const [state, setState] = useState('Admin')
+  const [state, setState] = useState("Admin");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { setAToken, backendUrl } = useContext(AdminContext);
+  const { enqueueSnackbar } = useSnackbar(); // Initialize useSnackbar
 
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState("");
+  const onSubmitHandler = async (event) => {
+    event.preventDefault();
 
-    const {setAToken, backendUrl} = useContext(AdminContext)
-
-    const onSubmitHandler = async (event) => {
-        event.preventDefault()
-
-        try{
-            if(state === 'Admin'){
-                const {data} = await axios.post(`${backendUrl}/api/admin/login`, {email, password})
-                if(data.success){
-
-                    console.log(data.token)
-                     Cookies.set("aToken", data.token, {
-                       expires: 1, // Expires in 1 day
-                       secure: true, // Only send over HTTPS
-                       sameSite: "strict", // Prevent CSRF attacks
-                     });
-                    setAToken(data.token)
-                }else{
-                    console.log(data.message)
-                    toast.error(data.message)
-                }
-            }else{
-
-            }
-        }catch(error){
-            console.log(error)
+    try {
+      if (state === "Admin") {
+        const { data } = await axios.post(
+          `${backendUrl}/api/admin/login`,
+          {
+            email,
+            password,
+          },
+          {
+            validateStatus: (status) => status < 500, // Only throw for 5xx errors
+          }
+        );
+        console.log(data.message);
+        if (data.success) {
+          //console.log(data.token);
+          Cookies.set("aToken", data.token, {
+            expires: 1, // Expires in 1 day
+            secure: true, // Only send over HTTPS
+            sameSite: "strict", // Prevent CSRF attacks
+          });
+          setAToken(data.token);
+          enqueueSnackbar("Login successful!", { variant: "success" }); // Show success toast
+        } else {
+          enqueueSnackbar(data.message, { variant: "error" }); // Show error toast
         }
-
-        
+      } else {
+        // Handle Doctor login logic here
+      }
+    } catch (error) {
+      //console.log(error);
+      enqueueSnackbar("An error occurred. Please try again.", {
+        variant: "error",
+      }); // Show error toast
     }
+  };
 
-
-
-    
-    
   return (
     <form onSubmit={onSubmitHandler} className="min-h-[80vh] flex items-center">
       <div className="flex flex-col gap-3 m-auto items-start p-8 min-w-[340px] sm:min-w-96 border rounded-xl text-[#5E5E5E] text-sm shadow-lg">
@@ -55,8 +60,8 @@ const Login = () => {
         <div className="w-full">
           <p>Email</p>
           <input
-          onChange={(e) => setEmail(e.target.value)}
-          value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            value={email}
             className="border border-[#DADADA] rounded w-full p-2 mt-1"
             type="email"
             required
@@ -99,6 +104,6 @@ const Login = () => {
       </div>
     </form>
   );
-}
+};
 
-export default Login
+export default Login;
