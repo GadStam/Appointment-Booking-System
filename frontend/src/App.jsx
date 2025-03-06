@@ -1,5 +1,6 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
+import { SnackbarProvider } from "notistack";
 import Home from './pages/Home'
 import Doctors from './pages/Doctors'
 import Contact from './pages/Contact'
@@ -14,6 +15,7 @@ import Footer from './components/Footer'
 const App = () => {
   return (
     <div className='mx-4 sm:mx-[10%]'>
+      <SnackbarProvider maxSnack={3}>
       <Navbar />
       <Routes>
         <Route path='/' element={<Home />} />
@@ -27,6 +29,7 @@ const App = () => {
         <Route path='/appointment/:docId' element={<Appointment />} />
       </Routes>
       <Footer/>
+      </SnackbarProvider>
     </div>
   )
 }
